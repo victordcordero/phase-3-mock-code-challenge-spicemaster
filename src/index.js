@@ -29,7 +29,7 @@ fetch('http://localhost:3000/spiceblends')
 }
 
 
-function singleSpice() {
+function singleSpice(currentSpiceBlend) {
     fetch(`http://localhost:3000/spiceblends/${currentSpiceBlend}`)
     .then(res => res.json())
     .then(data => showSpice(data))
@@ -49,7 +49,7 @@ function showSpice(e) {
     viewSpice.children[0].src = e.image
     viewSpice.children[0].alt = e.image
     viewSpice.children[1].innerText = e.title
-    ingredientForm.dataset.id = e.id
+    currentSpiceBlend = e.id
     ingredientList.innerText = ''
     e.ingredients.forEach(ingredient => { const li = document.createElement("li")
     li.textContent = ingredient.name
@@ -59,12 +59,8 @@ function showSpice(e) {
   
 function handleUpdateForm(event) {
     event.preventDefault()
-    // console.log(event.target.title.value) // using name attribute on the input element
-    // console.log(event.target[0].value)
     const titleInput = document.querySelector('#spiceblend-title').value
-    // optimistic
-    // const titleH2 = document.querySelector('h2.title')
-    // titleH2.textContent = titleInput
+    debugger
     event.target.reset()
     fetch(`http://localhost:3000/spiceblends/${currentSpiceBlend}`, {
         method: 'PATCH',
@@ -75,7 +71,6 @@ function handleUpdateForm(event) {
     })
         .then(response => response.json())
         .then(updatedSpiceBlend => {
-            // pessimistic
             const titleH2 = document.querySelector('h2.title')
             titleH2.textContent = updatedSpiceBlend.title
         })
@@ -84,15 +79,11 @@ function handleUpdateForm(event) {
 function handleNewIngredientForm(event) {
     event.preventDefault()
     const nameInput = event.target.name.value
-
     const li = document.createElement('li')
     li.textContent = nameInput
-
     const ingredientUl = document.querySelector('.ingredients-list')
     ingredientUl.append(li)
     event.target.reset()
-
-
     fetch('http://localhost:3000/ingredients', {
         method: 'POST',
         headers: {
@@ -103,5 +94,6 @@ function handleNewIngredientForm(event) {
         .then(response => response.json())
         .then(newIngredient => console.log(newIngredient))
 }
+
 getAllSpices()
 singleSpice(1)
